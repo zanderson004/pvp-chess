@@ -19,7 +19,16 @@
                [0, 0, 0, 0, 0, 0, 0, 0, 0],
                [0, 0, 0, 0, 0, 0, 0, 0, 0],
                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 8]],
+               [0, 0, 0, 0, 0, 0, 0, 0, 3]],
+        // grid: [[1, 2, 3, 4, 5, 6, 7, 8, 9],
+        //        [4, 5, 6, 7, 8, 9, 1, 2, 3],
+        //        [7, 8, 9, 1, 2, 3, 4, 5, 6],
+        //        [2, 3, 4, 5, 6, 7, 8, 9, 1],
+        //        [5, 6, 7, 8, 9, 1, 2, 3, 4],
+        //        [8, 9, 1, 2, 3, 4, 5, 6, 7],
+        //        [3, 4, 5, 6, 7, 8, 9, 1, 2],
+        //        [6, 7, 8, 9, 1, 2, 3, 4, 5],
+        //        [9, 1, 2, 3, 4, 5, 6, 7, 8]],
         mutable: [[true, true, true, true, true, true, true, true, true],
                   [true, true, true, true, true, true, true, true, true],
                   [true, true, true, true, true, true, true, true, true],
@@ -38,6 +47,8 @@
     methods: {
       // updates number in grid
       updateNum(event: KeyboardEvent) {
+        if (event.key == 'a') this.solve();
+
         let val: number = +event.key;
         if (this.mutable[this.currRow][this.currCol] && !isNaN(val)) {
           if (event.key == ' ' || val == 0) {
@@ -48,7 +59,7 @@
             this.grid[this.currRow][this.currCol] = val;
           }
           if (this.numFilled == 81 && this.valid()) console.log("You win!");
-        } else if (event.key == 'a') console.log(this.valid());
+        }
       },
 
       valid() {
@@ -83,6 +94,44 @@
           }
         }
         return true;
+      },
+
+      solve() {
+        // let tempGrid = Array(9);
+        let tempGrid = this.grid;
+        let indices = Array();
+        for (let row = 0; row < 9; row++) {
+          // tempGrid[row] = Array(9);
+          for (let col = 0; col < 9; col++) {
+            // tempGrid[row][col] = this.grid[row][col];
+            if (this.grid[row][col] == 0) {
+              indices.push([row, col]);
+            }
+          }
+        }
+
+        for (let i = 0; i < indices.length; i++) {
+          if (i < 0) {
+            console.log("No solution");
+            break;
+          }
+          console.log(JSON.stringify(tempGrid));
+
+          let row = indices[i][0];
+          let col = indices[i][1];
+          tempGrid[row][col]++;
+          if (tempGrid[row][col] == 10) {
+            tempGrid[row][col] = 0;
+            i -= 2;
+          }
+          while (!this.valid()) {
+            tempGrid[row][col]++;
+            if (tempGrid[row][col] == 10) {
+              tempGrid[row][col] = 0;
+              i -= 2;
+            }
+          }
+        }
       }
     }
   }
