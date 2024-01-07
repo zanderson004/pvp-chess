@@ -111,12 +111,10 @@
         }
 
         for (let i = 0; i < indices.length; i++) {
-          console.log(i);
           if (i < 0) {
             console.log("No solution");
             break;
           }
-          console.log(JSON.stringify(tempGrid));
 
           let row = indices[i][0];
           let col = indices[i][1];
