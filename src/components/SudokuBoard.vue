@@ -111,6 +111,7 @@
         }
 
         for (let i = 0; i < indices.length; i++) {
+          console.log(i);
           if (i < 0) {
             console.log("No solution");
             break;
@@ -129,6 +130,7 @@
             if (tempGrid[row][col] == 10) {
               tempGrid[row][col] = 0;
               i -= 2;
+              break;
             }
           }
         }
