@@ -19,7 +19,7 @@
                [0, 0, 0, 0, 0, 0, 0, 0, 0],
                [0, 0, 0, 0, 0, 0, 0, 0, 0],
                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-               [0, 0, 0, 0, 0, 0, 0, 0, 3]],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0]],
         // grid: [[1, 2, 3, 4, 5, 6, 7, 8, 9],
         //        [4, 5, 6, 7, 8, 9, 1, 2, 3],
         //        [7, 8, 9, 1, 2, 3, 4, 5, 6],
@@ -29,15 +29,15 @@
         //        [3, 4, 5, 6, 7, 8, 9, 1, 2],
         //        [6, 7, 8, 9, 1, 2, 3, 4, 5],
         //        [9, 1, 2, 3, 4, 5, 6, 7, 8]],
-        mutable: [[true, true, true, true, true, true, true, true, true],
-                  [true, true, true, true, true, true, true, true, true],
-                  [true, true, true, true, true, true, true, true, true],
-                  [true, true, true, true, true, true, true, true, true],
-                  [true, true, true, true, true, true, true, true, true],
-                  [true, true, true, true, true, true, true, true, true],
-                  [true, true, true, true, true, true, true, true, true],
-                  [true, true, true, true, true, true, true, true, true],
-                  [true, true, true, true, true, true, true, true, false]],
+        mutable: [[false, false, false, false, false, false, false, false, false],
+                  [false, false, false, false, false, false, false, false, false],
+                  [false, false, false, false, false, false, false, false, false],
+                  [false, false, false, false, false, false, false, false, false],
+                  [false, false, false, false, false, false, false, false, false],
+                  [false, false, false, false, false, false, false, false, false],
+                  [false, false, false, false, false, false, false, false, false],
+                  [false, false, false, false, false, false, false, false, false],
+                  [false, false, false, false, false, false, false, false, false]],
         currRow: 0,
         currCol: 0,
         numFilled: 1,
@@ -47,7 +47,8 @@
     methods: {
       // updates number in grid
       updateNum(event: KeyboardEvent) {
-        if (event.key == 'a') this.solve();
+        if (event.key == 'a') this.generateBoard(30);
+        if (event.key == 'b') console.log(this.solve(false));
 
         let val: number = +event.key;
         if (this.mutable[this.currRow][this.currCol] && !isNaN(val)) {
@@ -58,16 +59,16 @@
             if (this.grid[this.currRow][this.currCol] == 0) this.numFilled++;
             this.grid[this.currRow][this.currCol] = val;
           }
-          if (this.numFilled == 81 && this.valid()) console.log("You win!");
+          if (this.numFilled == 81 && this.valid(this.grid)) console.log("You win!");
         }
       },
 
-      valid() {
+      valid(grid: Array<Array<number>>) {
         // check rows
         for (let row = 0; row < 9; row++) {
           let mask = 0;
           for (let col = 0; col < 9; col++) {
-            let num = this.grid[row][col];
+            let num = grid[row][col];
             if (num == 0) continue;
             if (mask >> num-1 & 1) return false;  
             mask += 1 << num-1;
@@ -77,7 +78,7 @@
         for (let col = 0; col < 9; col++) {
           let mask = 0;
           for (let row = 0; row < 9; row++) {
-            let num = this.grid[row][col];
+            let num = grid[row][col];
             if (num == 0) continue;
             if (mask >> num-1 & 1) return false;  
             mask += 1 << num-1;
@@ -87,7 +88,7 @@
         for (let box of this.boxIndices) {
           let mask = 0;
           for (let i = 0; i < 9; i++) {
-            let num = this.grid[box[0] + Math.floor(i/3)][box[1] + i % 3];
+            let num = grid[box[0] + Math.floor(i/3)][box[1] + i % 3];
             if (num == 0) continue;
             if (mask >> num-1 & 1) return false;  
             mask += 1 << num-1;
@@ -96,25 +97,22 @@
         return true;
       },
 
-      solve() {
-        // let tempGrid = Array(9);
-        let tempGrid = this.grid;
+      solve(inplace: boolean) {
+        let tempGrid: Array<Array<number>>;
+        if (inplace) tempGrid = this.grid;
+        else tempGrid = JSON.parse(JSON.stringify(this.grid));
         let indices = Array();
         for (let row = 0; row < 9; row++) {
-          // tempGrid[row] = Array(9);
           for (let col = 0; col < 9; col++) {
-            // tempGrid[row][col] = this.grid[row][col];
             if (this.grid[row][col] == 0) {
               indices.push([row, col]);
             }
           }
         }
 
+        let numSols = 0;
         for (let i = 0; i < indices.length; i++) {
-          if (i < 0) {
-            console.log("No solution");
-            break;
-          }
+          if (i < 0 || numSols > 1) return numSols;
 
           let row = indices[i][0];
           let col = indices[i][1];
@@ -123,7 +121,7 @@
             tempGrid[row][col] = 0;
             i -= 2;
           }
-          while (!this.valid()) {
+          while (!this.valid(tempGrid)) {
             tempGrid[row][col]++;
             if (tempGrid[row][col] == 10) {
               tempGrid[row][col] = 0;
@@ -131,6 +129,39 @@
               break;
             }
           }
+          if (i == indices.length-1) {
+            numSols++;
+            i--;
+          }
+        }
+      },
+
+      generateBoard(difficulty: number) {
+        this.numFilled = 81 - difficulty;
+        this.solve(true);
+        let indices = Array();
+        for (let row = 0; row < 9; row++) {
+          for (let col = 0; col < 9; col++) {
+            indices.push([row, col]);
+          }
+        }
+        indices = indices.sort((a, b) => 0.5 - Math.random());
+        let i = 0;
+        let last = 0;
+        while (difficulty > 0) {
+          last = this.grid[indices[i][0]][indices[i][1]];
+          this.grid[indices[i][0]][indices[i][1]] = 0;
+          this.mutable[indices[i][0]][indices[i][1]] = true;
+          i++;
+          difficulty--;
+        }
+        while (this.solve(false) != 1) {
+          this.grid[indices[i-1][0]][indices[i-1][1]] = last;
+          this.mutable[indices[i-1][0]][indices[i-1][1]] = false;
+          last = this.grid[indices[i][0]][indices[i][1]];
+          this.grid[indices[i][0]][indices[i][1]] = 0;
+          this.mutable[indices[i][0]][indices[i][1]] = true;
+          i++;
         }
       }
     }

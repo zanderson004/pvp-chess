@@ -16,8 +16,9 @@
   
 <style scoped>
   .sudoku-cell {
-    width: 40px;
-    height: 40px;
+    width: 70px;
+    height: 70px;
+    font-size: x-large;
     border: 1px solid grey;
     color: white;
     display: inline-flex;
@@ -47,6 +48,7 @@
 
   .immutable {
     font-weight: bold;
-    color: greenyellow;
+    /* color: greenyellow; */
+    color: rgb(207, 72, 207);
   }
 </style>
