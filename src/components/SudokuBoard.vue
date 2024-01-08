@@ -197,7 +197,7 @@
         }
         indices = indices.sort((a, b) => 0.5 - Math.random());
 
-        // remove cells from grid x times (x = difficulty)
+        // remove cells from grid up to x times (x = difficulty)
         this.numFilled = 81 - difficulty;
         let i = 0;
         while (difficulty > 0 && i < 81) {
@@ -213,8 +213,9 @@
           i++;
         }
 
-        // if no board correctly generated
-        if (difficulty > 0) this.generateBoard(difficulty);
+        // set starting filled amount if not all x cells were erased
+        this.numFilled += difficulty;
+        console.log(this.numFilled);
       }
     }
   }
@@ -225,7 +226,7 @@
   <div style="padding: 50px; display: flex; justify-content: center;">
     <button @click="generateBoard(20)">Easy</button>
     <button @click="generateBoard(40)">Medium</button>
-    <button @click="generateBoard(60)">Hard</button>
+    <button @click="generateBoard(50)">Hard</button>
   </div>
 
   <div class="sudoku-board" @keydown="updateNum($event)" tabindex="-1">
