@@ -20,7 +20,10 @@ import SudokuBoard from './components/SudokuBoard.vue';
 
   <RouterView /> -->
 
-  <SudokuBoard/>
+  <div>
+    <SudokuBoard ref="board"/>
+  </div>
+
 </template>
 
 <style scoped>
