@@ -215,7 +215,6 @@
 
         // set starting filled amount if not all x cells were erased
         this.numFilled += difficulty;
-        console.log(this.numFilled);
       }
     }
   }
